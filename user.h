@@ -23,9 +23,10 @@ typedef struct {
     char timestamp[30];
 } Order;
 
-// Declare the shared variables — NOT define them here!
-extern Train trains[];
+// Declare the shared variables
+extern Train *trains;
 extern int trainCount;
+extern int trainCapacity;
 
 // Function declarations
 void loadTrains();  // to allow other files to call it
