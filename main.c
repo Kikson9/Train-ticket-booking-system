@@ -5,10 +5,9 @@
 #include "admin.h"
 #include "user.h"
 
-#define MAX_TRAINS 100
-
-Train trains[MAX_TRAINS];
+Train *trains = NULL;
 int trainCount = 0;
+int trainCapacity = 0;
 
 // ============================
 // Function: loadTrains()
@@ -23,6 +22,7 @@ void loadTrains() {
     }
 
     trainCount = 0;
+
     while (fscanf(fp, "%d,%[^,],%[^,],%[^,],%[^,],%d\n",
                   &trains[trainCount].train_id,
                   trains[trainCount].name,
@@ -30,6 +30,17 @@ void loadTrains() {
                   trains[trainCount].destination,
                   trains[trainCount].time,
                   &trains[trainCount].available_seats) == 6) {
+
+        // realloc if needed
+        if (trainCount >= trainCapacity) {
+            trainCapacity *= 2;
+            trains = realloc(trains, trainCapacity * sizeof(Train));
+            if (trains == NULL) {
+                printf("Reallocation failed.\n");
+                exit(1);
+            }
+        }
+
         trainCount++;
     }
 
@@ -38,8 +49,15 @@ void loadTrains() {
 
 int main() {
     int choice;
-
     srand(time(NULL));
+
+    trainCapacity = 10;
+    trains = malloc(trainCapacity * sizeof(Train));
+
+    if (trains == NULL) {
+        printf("Memory allocation failed.\n");
+    return 1;
+        
     loadTrains();
 
     while (1) {
@@ -59,6 +77,7 @@ int main() {
                 break;
             case 3:
                 printf("Thank you for using the system.\n");
+                free(trains);
                 exit(0);
             default:
                 printf("Invalid choice. Please try again.\n");
