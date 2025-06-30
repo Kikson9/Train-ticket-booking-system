@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "admin.h"
+#include "user.h"
 
 
 void adminMenu() {
@@ -38,7 +39,8 @@ void addTrain() {
         return;
     }
 
-    Train newTrain;
+    Train newTrain;  // define first
+
     printf("Enter Train ID: ");
     scanf("%d", &newTrain.train_id);
     printf("Enter Train Name: ");
@@ -52,6 +54,18 @@ void addTrain() {
     printf("Enter Available Seats: ");
     scanf("%d", &newTrain.available_seats);
 
+    // Expand memory if needed
+    if (trainCount >= trainCapacity) {
+        trainCapacity *= 2;
+        trains = realloc(trains, trainCapacity * sizeof(Train));
+        if (trains == NULL) {
+            printf("Reallocation failed.\n");
+            return;
+        }
+    }
+
+    trains[trainCount++] = newTrain;  // Store newTrain in array
+
     fprintf(fp, "%d,%s,%s,%s,%s,%d\n",
             newTrain.train_id,
             newTrain.name,
@@ -61,12 +75,13 @@ void addTrain() {
             newTrain.available_seats);
 
     fclose(fp);
-    printf("Train added successfully.\n");
 
-    loadTrains(); // refresh in-memory data
+    loadTrains();  // Refresh train list from file
+
+    printf("Train added successfully.\n");
     printf("Press Enter to return to menu...");
-    getchar();  // Flush leftover newline
-    getchar();  // Wait for actual Enter press
+    getchar();
+    getchar();
 }
 
 void deleteTrain() {
